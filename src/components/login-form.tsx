@@ -51,7 +51,7 @@ export default function LoginForm({ next }: { next: string }) {
           autoFocus
           value={username}
           onChange={(event) => setUsername(event.target.value)}
-          placeholder="Contoh: rina"
+          placeholder="masukkan username"
           className={inputClass}
         />
       </div>
