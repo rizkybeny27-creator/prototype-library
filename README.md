@@ -5,13 +5,21 @@ Portal internal untuk menyimpan, mengelola, dan menguji prototype HTML (UI/UX te
 ## Menjalankan
 
 1. Buat project gratis di [supabase.com](https://supabase.com).
-2. Di Supabase SQL editor, jalankan isi `supabase/schema.sql` (tabel `projects`/`versions`/`feedback`, view `project_overview`, dan fungsi `publish_version`).
+2. Di Supabase SQL editor, jalankan isi `supabase/schema.sql` (tabel `projects`/`versions`/`feedback`/`profiles`, view `project_overview`, dan fungsi `publish_version`).
 3. Salin `.env.example` ke `.env.local` dan isi:
    - `SUPABASE_URL` — URL project (mis. `https://abc123.supabase.co`)
    - `SUPABASE_SERVICE_ROLE_KEY` — *service role* key (Settings → API). Hanya dipakai server-side (amankan; jangan diekspos ke client).
+   - `SUPABASE_ANON_KEY` — *anon* key (Settings → API). Publik; dipakai untuk sesi login (Supabase Auth).
    - `SUPABASE_STORAGE_BUCKET` — opsional, default `prototype-html`. Bucket dibuat otomatis saat upload pertama.
-   - `ADMIN_ACCESS_TOKEN` — rahasia bersama (generate dengan `openssl rand -hex 32`) untuk login admin.
-4. Jalankan app:
+4. Siapkan akun staf:
+   - Buat user di Supabase Dashboard: **Authentication → Users → Add user** (email + password).
+   - Tambahkan baris `profiles` agar login memakai username (bukan email), contoh:
+     ```sql
+     insert into profiles (id, username, email)
+     values ('<user-id-dari-supabase>', 'rina', '<email-user>');
+     ```
+     (`username` disimpan lowercase; unik secara case-insensitive.)
+5. Jalankan app:
 
 ```bash
 npm install
@@ -52,5 +60,6 @@ supabase/
 
 - Aplikasi memakai `SUPABASE_SERVICE_ROLE_KEY` di sisi server (server components & API routes) sehingga RLS tidak dibutuhkan untuk saat ini. Jangan pernah membocorkan key ini ke client/browser.
 - HTML prototype disimpan di Supabase Storage (bucket private) dan disajikan lewat `/r/<slug>/<label>` dengan header `nosniff` + `no-store`.
-- Akses admin (halaman & API manajemen) dibatasi oleh `src/proxy.ts` (Next.js Proxy) yang membutuhkan cookie login `/login` (httpOnly + SameSite=Strict). Halaman tester (`/t/*`, `/r/*`) dan submit feedback tester tetap publik.
-- Rate limit in-memory (30/menit untuk upload, 20/menit untuk feedback per IP) via `src/proxy.ts`.
+- Autentikasi admin memakai **Supabase Auth** (username + password). Sesi disimpan di cookie `httpOnly` + `SameSite=Strict` (`@supabase/ssr`), diperiksa oleh `src/proxy.ts` dan di-refresh otomatis. Username dipetakan ke email via tabel `profiles`.
+- Halaman tester (`/t/*`, `/r/*`) dan submit feedback tester tetap publik.
+- Rate limit in-memory (30/menit upload, 20/menit feedback, 10/menit login per IP) via `src/proxy.ts`.

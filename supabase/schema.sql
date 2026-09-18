@@ -39,6 +39,18 @@ create index if not exists idx_versions_project on versions(project_id);
 create index if not exists idx_versions_published on versions(project_id, is_published);
 create index if not exists idx_feedback_version on feedback(version_id);
 
+-- App users (username -> auth.users). GoTrue has no native username,
+-- so the login flow resolves username -> email through this table.
+create table if not exists profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  username   text not null,
+  email      text not null,
+  created_at timestamptz not null default now()
+);
+
+create unique index if not exists idx_profiles_username_lower
+  on profiles (lower(username));
+
 -- Homepage list with aggregate columns.
 create or replace view project_overview as
 select

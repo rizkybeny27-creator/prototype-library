@@ -21,7 +21,7 @@ export default async function LoginPage({
           Prototype Library
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          Masuk dengan admin token untuk mengelola prototype.
+          Masuk dengan akun tim untuk mengelola prototype.
         </p>
         <div className="mt-6">
           <LoginForm next={safeNext} />

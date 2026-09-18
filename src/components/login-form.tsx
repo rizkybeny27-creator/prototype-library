@@ -6,7 +6,8 @@ import { inputClass, labelClass, primaryButtonClass } from "@/components/ui/styl
 
 export default function LoginForm({ next }: { next: string }) {
   const router = useRouter();
-  const [token, setToken] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -18,7 +19,7 @@ export default function LoginForm({ next }: { next: string }) {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, next }),
+        body: JSON.stringify({ username, password, next }),
       });
       const body = (await res.json().catch(() => null)) as {
         error?: string;
@@ -39,17 +40,33 @@ export default function LoginForm({ next }: { next: string }) {
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
       <div>
-        <label htmlFor="admin-token" className={labelClass}>
-          Admin token
+        <label htmlFor="username" className={labelClass}>
+          Username
         </label>
         <input
-          id="admin-token"
+          id="username"
+          type="text"
+          autoComplete="username"
+          required
+          autoFocus
+          value={username}
+          onChange={(event) => setUsername(event.target.value)}
+          placeholder="Contoh: rina"
+          className={inputClass}
+        />
+      </div>
+      <div>
+        <label htmlFor="password" className={labelClass}>
+          Password
+        </label>
+        <input
+          id="password"
           type="password"
           autoComplete="current-password"
           required
-          value={token}
-          onChange={(event) => setToken(event.target.value)}
-          placeholder="Masukkan ADMIN_ACCESS_TOKEN"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="••••••••"
           className={inputClass}
         />
       </div>

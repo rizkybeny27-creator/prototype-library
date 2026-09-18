@@ -1,14 +1,23 @@
 import { NextResponse } from "next/server";
-import { ADMIN_COOKIE_NAME } from "@/lib/admin-auth";
+import {
+  createAuthClient,
+  parseCookies,
+  type PendingCookie,
+} from "@/lib/supabase-auth";
 
-export async function POST() {
-  const response = NextResponse.json({ ok: true });
-  response.cookies.set(ADMIN_COOKIE_NAME, "", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    path: "/",
-    maxAge: 0,
+export async function POST(request: Request) {
+  const pendingCookies: PendingCookie[] = [];
+  const supabase = createAuthClient({
+    getAll: () => parseCookies(request.headers.get("cookie")),
+    setAll: (cookies: PendingCookie[]) => pendingCookies.push(...cookies),
   });
+
+  await supabase.auth.signOut();
+
+  const response = NextResponse.json({ ok: true });
+  for (const cookie of pendingCookies) {
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+  }
+  response.headers.set("Cache-Control", "no-store");
   return response;
 }

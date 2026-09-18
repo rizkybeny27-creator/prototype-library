@@ -9,7 +9,7 @@ const globalForSupabase = globalThis as unknown as {
   __prototypeBucketChecked?: boolean;
 };
 
-function getEnvOrThrow(name: string): string {
+export function getEnvOrThrow(name: string): string {
   const value = process.env[name];
   if (!value) {
     throw new Error(
@@ -17,6 +17,10 @@ function getEnvOrThrow(name: string): string {
     );
   }
   return value;
+}
+
+export async function getSupabaseAnonKey(): Promise<string> {
+  return getEnvOrThrow("SUPABASE_ANON_KEY");
 }
 
 export function getSupabase(): SupabaseClient {
