@@ -21,6 +21,8 @@ create table if not exists versions (
   file_name    text not null,
   size_bytes   bigint not null default 0,
   is_published boolean not null default false,
+  device       text not null default 'responsive'
+               check (device in ('desktop','mobile','responsive')),
   created_at   timestamptz not null default now(),
   unique (project_id, number)
 );

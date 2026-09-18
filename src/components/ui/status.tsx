@@ -20,6 +20,14 @@ export function TestTypeBadge({ label }: { label: string }) {
   );
 }
 
+export function DeviceBadge({ label }: { label: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 text-xs font-medium text-zinc-600">
+      {label}
+    </span>
+  );
+}
+
 export function EmptyState({
   title,
   description,

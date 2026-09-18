@@ -3,11 +3,12 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getProjectDetail } from "@/services/projects";
-import { TEST_TYPE_LABELS } from "@/types";
+import { DEVICE_LABELS, TEST_TYPE_LABELS } from "@/types";
 import type { VersionListItem } from "@/types";
 import { formatBytes, formatDate } from "@/lib/format";
-import { EmptyState, TestTypeBadge } from "@/components/ui/status";
+import { DeviceBadge, EmptyState, TestTypeBadge } from "@/components/ui/status";
 import { sectionTitleClass } from "@/components/ui/styles";
+import { DeviceFrame } from "@/components/device-frame";
 import UploadVersionForm from "@/components/upload-version-form";
 import CopyButton from "@/components/copy-button";
 
@@ -91,12 +92,14 @@ export default async function ProjectPage({
                 Preview internal · {previewVersion.label}
               </span>
             </div>
-            <iframe
-              title={`Preview ${detail.name} ${previewVersion.label}`}
-              src={`/r/${detail.slug}/${previewVersion.label}`}
-              sandbox="allow-scripts"
-              className="h-[60vh] w-full bg-white"
-            />
+            <DeviceFrame device={previewVersion.device}>
+              <iframe
+                title={`Preview ${detail.name} ${previewVersion.label}`}
+                src={`/r/${detail.slug}/${previewVersion.label}`}
+                sandbox="allow-scripts"
+                className="h-[60vh] w-full bg-white"
+              />
+            </DeviceFrame>
           </div>
         ) : (
           <div className="mt-3">
@@ -164,6 +167,7 @@ function VersionRow({
           <span className="font-mono text-sm font-semibold text-zinc-900">
             {version.label}
           </span>
+          <DeviceBadge label={DEVICE_LABELS[version.device]} />
           {version.isPublished ? (
             <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
               Sedang aktif untuk tester

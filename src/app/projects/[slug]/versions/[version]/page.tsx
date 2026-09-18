@@ -5,12 +5,13 @@ import { notFound } from "next/navigation";
 import { getProjectVersionDetail } from "@/services/projects";
 import { feedbackStats } from "@/services/feedback";
 import { formatBytes, formatDate } from "@/lib/format";
-import { EmptyState, StatusBadge } from "@/components/ui/status";
+import { DeviceBadge, EmptyState, StatusBadge } from "@/components/ui/status";
 import { Stars } from "@/components/star-rating";
 import PublishToggle from "@/components/publish-toggle";
 import CopyButton from "@/components/copy-button";
 import VersionTabs from "@/components/version-tabs";
-import { NPS_SCORES } from "@/types";
+import { DeviceFrame } from "@/components/device-frame";
+import { DEVICE_LABELS, NPS_SCORES } from "@/types";
 import type { Feedback } from "@/types";
 
 export default async function VersionDetailPage({
@@ -40,6 +41,7 @@ export default async function VersionDetailPage({
             {version.label}
           </h1>
           <StatusBadge published={version.isPublished} />
+          <DeviceBadge label={DEVICE_LABELS[version.device]} />
         </div>
         {version.changelog ? (
           <p className="mt-2 max-w-2xl text-sm text-zinc-500">
@@ -93,12 +95,14 @@ export default async function VersionDetailPage({
               <div className="flex justify-end border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-xs text-zinc-400">
                 Preview internal · {version.label}
               </div>
-              <iframe
-                title={`Preview ${version.label}`}
-                src={`/r/${project.slug}/${version.label}`}
-                sandbox="allow-scripts"
-                className="h-[60vh] w-full bg-white"
-              />
+              <DeviceFrame device={version.device}>
+                <iframe
+                  title={`Preview ${version.label}`}
+                  src={`/r/${project.slug}/${version.label}`}
+                  sandbox="allow-scripts"
+                  className="h-[60vh] w-full bg-white"
+                />
+              </DeviceFrame>
             </div>
           }
           feedbackPanel={

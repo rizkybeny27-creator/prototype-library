@@ -11,11 +11,14 @@ import {
   labelClass,
   primaryButtonClass,
 } from "@/components/ui/styles";
+import { DEVICE_LABELS, DEVICES } from "@/types";
+import type { Device } from "@/types";
 
 export default function UploadVersionForm({ slug }: { slug: string }) {
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [changelog, setChangelog] = useState("");
+  const [device, setDevice] = useState<Device>("responsive");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">(
     "idle"
   );
@@ -34,6 +37,7 @@ export default function UploadVersionForm({ slug }: { slug: string }) {
     const body = new FormData();
     body.append("file", file);
     body.append("changelog", changelog);
+    body.append("device", device);
 
     const result = await apiUploadVersion(slug, body);
 
@@ -67,6 +71,42 @@ export default function UploadVersionForm({ slug }: { slug: string }) {
         />
         <p className="mt-1 text-xs text-zinc-400">
           Satu file HTML self-contained, maksimal 15 MB.
+        </p>
+      </div>
+
+      <div>
+        <span id="device-label" className={labelClass}>
+          Target tampilan
+        </span>
+        <div
+          role="radiogroup"
+          aria-labelledby="device-label"
+          className="flex w-fit gap-1 rounded-lg bg-zinc-100 p-1"
+        >
+          {DEVICES.map((item) => {
+            const active = device === item;
+            return (
+              <button
+                key={item}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => setDevice(item)}
+                disabled={isLoading}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition disabled:opacity-60 ${
+                  active
+                    ? "bg-white text-zinc-900 shadow-sm"
+                    : "text-zinc-500 hover:text-zinc-900"
+                }`}
+              >
+                {DEVICE_LABELS[item]}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1 text-xs text-zinc-400">
+          Tester melihat versi ini sesuai target tampilan — Mobile dibatasi lebar
+          layar ponsel, Responsif mengikuti lebar layar tester.
         </p>
       </div>
 

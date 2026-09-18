@@ -2,6 +2,10 @@ export const TEST_TYPES = ["usability", "ab", "survey", "other"] as const;
 
 export type TestType = (typeof TEST_TYPES)[number];
 
+export const DEVICES = ["desktop", "mobile", "responsive"] as const;
+
+export type Device = (typeof DEVICES)[number];
+
 export type VersionLabel = `v${number}`;
 
 export interface Project {
@@ -30,6 +34,7 @@ export interface Version {
   fileName: string;
   sizeBytes: number;
   isPublished: boolean;
+  device: Device;
   createdAt: string;
 }
 
@@ -97,4 +102,10 @@ export const TEST_TYPE_LABELS: Record<TestType, string> = {
   ab: "A/B Test",
   survey: "Survey",
   other: "Lainnya",
+};
+
+export const DEVICE_LABELS: Record<Device, string> = {
+  desktop: "Desktop",
+  mobile: "Mobile",
+  responsive: "Responsif",
 };

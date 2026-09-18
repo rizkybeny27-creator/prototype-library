@@ -1,4 +1,4 @@
-import type { Feedback, Project, Version } from "@/types";
+import type { Device, Feedback, Project, Version } from "@/types";
 
 type Row = Record<string, unknown>;
 
@@ -25,6 +25,7 @@ export function mapVersionRow(row: Row): Version {
     fileName: row.file_name as string,
     sizeBytes: row.size_bytes as number,
     isPublished: Boolean(row.is_published),
+    device: (row.device as Device) ?? "responsive",
     createdAt: row.created_at as string,
   };
 }

@@ -3,7 +3,7 @@ import { mapVersionRow } from "@/lib/row-mapper";
 import { getSupabase } from "@/lib/supabase";
 import { touchProject } from "@/services/projects";
 import { writeVersionHtml } from "@/services/files";
-import type { Version } from "@/types";
+import type { Device, Version } from "@/types";
 
 export async function getVersionById(id: number): Promise<Version | null> {
   const { data, error } = await getSupabase()
@@ -72,6 +72,7 @@ export async function createVersion(
     file: Uint8Array;
     fileName: string;
     changelog: string;
+    device: Device;
   }
 ): Promise<Version> {
   const now = new Date().toISOString();
@@ -91,6 +92,7 @@ export async function createVersion(
       file_name: stored.fileName,
       size_bytes: stored.sizeBytes,
       is_published: false,
+      device: input.device,
       created_at: now,
     })
     .select("*")

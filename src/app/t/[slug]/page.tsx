@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import { getProjectDetail } from "@/services/projects";
 import TesterFeedbackWidget from "@/components/tester-feedback-widget";
+import TesterPreview from "@/components/tester-preview";
 
 export default async function TesterPage({
   params,
@@ -50,11 +51,11 @@ export default async function TesterPage({
           <strong className="font-mono text-zinc-800">{published.label}</strong>
         </div>
       </header>
-      <iframe
+      <TesterPreview
+        slug={slug}
+        label={published.label}
+        device={published.device}
         title={`${detail.name} - ${published.label}`}
-        src={`/r/${slug}/${published.label}`}
-        sandbox="allow-scripts"
-        className="min-h-0 w-full flex-1 border-0 bg-white"
       />
       <TesterFeedbackWidget versionId={published.id} />
     </div>
