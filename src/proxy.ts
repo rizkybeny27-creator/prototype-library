@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createAuthClient, type PendingCookie } from "@/lib/supabase-auth";
+import { isSupabaseConfigured } from "@/lib/supabase";
+
+const NOT_CONFIGURED_MESSAGE =
+  "Server belum dikonfigurasi untuk lingkungan ini. Tambahkan environment variable " +
+  "SUPABASE_URL, SUPABASE_ANON_KEY, dan SUPABASE_SERVICE_ROLE_KEY di Vercel " +
+  "(Settings → Environment Variables, scope Production & Preview), lalu redeploy.";
 
 const RATE_LIMIT: Record<
   "upload" | "feedback" | "login",
@@ -54,6 +60,30 @@ function rateLimited(): NextResponse {
   );
 }
 
+function serviceUnavailable(request: NextRequest, message: string): NextResponse {
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
+  const body = `<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype Library</title>
+</head>
+<body style="margin:0;background:#fafafa;font-family:system-ui,-apple-system,sans-serif;color:#18181b;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px">
+<div style="max-width:560px;background:#fff;border:1px solid #e4e4e7;border-radius:16px;padding:32px">
+<h1 style="margin:0 0 8px;font-size:20px">Prototype Library</h1>
+<p style="margin:0;color:#52525b;line-height:1.6">${message}</p>
+</div>
+</body>
+</html>`;
+  return new NextResponse(body, {
+    status: 503,
+    headers: { "content-type": "text/html; charset=utf-8" },
+  });
+}
+
 export async function proxy(request: NextRequest) {
   const now = Date.now();
   if (rateBuckets.size > 10_000) {
@@ -90,27 +120,38 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (!isSupabaseConfigured()) {
+    return serviceUnavailable(request, NOT_CONFIGURED_MESSAGE);
+  }
+
   let response = NextResponse.next({ request });
-  const supabase = createAuthClient({
-    getAll: () =>
-      request.cookies
-        .getAll()
-        .map((cookie) => ({ name: cookie.name, value: cookie.value, options: {} })),
-    setAll: (cookies: PendingCookie[]) => {
-      for (const cookie of cookies) {
-        request.cookies.set(cookie.name, cookie.value);
-      }
-      response = NextResponse.next({ request });
-      for (const cookie of cookies) {
-        response.cookies.set(cookie.name, cookie.value, cookie.options);
-      }
-    },
-  });
+  try {
+    const supabase = createAuthClient({
+      getAll: () =>
+        request.cookies
+          .getAll()
+          .map((cookie) => ({ name: cookie.name, value: cookie.value, options: {} })),
+      setAll: (cookies: PendingCookie[]) => {
+        for (const cookie of cookies) {
+          request.cookies.set(cookie.name, cookie.value);
+        }
+        response = NextResponse.next({ request });
+        for (const cookie of cookies) {
+          response.cookies.set(cookie.name, cookie.value, cookie.options);
+        }
+      },
+    });
 
-  const { data } = await supabase.auth.getUser();
+    const { data } = await supabase.auth.getUser();
 
-  if (data.user) {
-    return response;
+    if (data.user) {
+      return response;
+    }
+  } catch {
+    return serviceUnavailable(
+      request,
+      "Layanan autentikasi sedang tidak tersedia. Silakan coba lagi nanti."
+    );
   }
 
   if (request.nextUrl.pathname.startsWith("/api/")) {

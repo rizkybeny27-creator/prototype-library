@@ -4,8 +4,16 @@ import {
   parseCookies,
   type PendingCookie,
 } from "@/lib/supabase-auth";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 export async function POST(request: Request) {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: "Server belum dikonfigurasi.", code: "NOT_CONFIGURED" },
+      { status: 503 }
+    );
+  }
+
   const pendingCookies: PendingCookie[] = [];
   const supabase = createAuthClient({
     getAll: () => parseCookies(request.headers.get("cookie")),

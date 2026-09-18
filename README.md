@@ -33,6 +33,19 @@ npm run build
 npm run start
 ```
 
+## Deployment ke Vercel
+
+1. Import repositori `rizkybeny27-creator/prototype-library` di vercel.com. Deteksi framework otomatis = **Next.js** (`framework: "nextjs"` sudah dikunci lewat `vercel.json`).
+2. Tambahkan **environment variables** (nilai dari `.env.local`) di **Settings → Environment Variables**, dan centang ketiga scope: **Production, Preview, Development**:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE_KEY` (rahasia — gunakan "Encrypted")
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_STORAGE_BUCKET` (opsional, default `prototype-html`)
+3. **Clear build cache, lalu Redeploy.** Tanpa variabel tersebut aplikasi menampilkan halaman 503 "Server belum dikonfigurasi" (bukan 500) agar jelas apa yang kurang.
+4. Verifikasi: buka URL deployment → harus redirect ke `/login`; isi kredensial akun staf hasil seeding.
+
+> Catatan: jika akun Vercel mengaktifkan SSO/SAML, URL deployment hanya bisa diakses setelah masuk ke akun Vercel — ini bisa terlihat seperti "mengunduh/redirect ke vercel.com" bagi pengunjung yang belum login.
+
 > Data awal aplikasi berasal dari Supabase (bersih). Data lama yang tersimpan di `storage/` (era SQLite lokal) tidak lagi dibaca oleh aplikasi.
 
 ## Alur inti

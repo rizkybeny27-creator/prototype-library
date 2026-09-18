@@ -4,11 +4,43 @@ import Link from "next/link";
 import { listProjects } from "@/services/projects";
 import { TEST_TYPE_LABELS } from "@/types";
 import { formatDate } from "@/lib/format";
+import { isSupabaseConfigured } from "@/lib/supabase";
 import { EmptyState, TestTypeBadge } from "@/components/ui/status";
 import { secondaryButtonClass } from "@/components/ui/styles";
 import LogoutButton from "@/components/logout-button";
 
 export default async function Home() {
+  if (!isSupabaseConfigured()) {
+    return (
+      <main className="mx-auto w-full max-w-4xl px-6 py-12">
+        <div className="rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-widest text-zinc-500">
+            Internal team
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-zinc-900">
+            Prototype Library
+          </h1>
+          <p className="mt-3 max-w-xl text-sm leading-relaxed text-zinc-500">
+            Server belum dikonfigurasi untuk lingkungan ini. Tambahkan{" "}
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs">
+              SUPABASE_URL
+            </code>
+            ,{" "}
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs">
+              SUPABASE_ANON_KEY
+            </code>
+            , dan{" "}
+            <code className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs">
+              SUPABASE_SERVICE_ROLE_KEY
+            </code>{" "}
+            di Vercel (Settings → Environment Variables, scope Production &amp;
+            Preview), lalu redeploy.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
   const projects = await listProjects();
 
   return (

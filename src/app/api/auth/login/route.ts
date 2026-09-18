@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAuthClient, type PendingCookie } from "@/lib/supabase-auth";
 import { findEmailByUsername } from "@/services/profiles";
+import { isSupabaseConfigured } from "@/lib/supabase";
+
+const NOT_CONFIGURED_MESSAGE =
+  "Server belum dikonfigurasi: tambahkan SUPABASE_URL, SUPABASE_ANON_KEY, dan " +
+  "SUPABASE_SERVICE_ROLE_KEY di Vercel lalu redeploy.";
 
 interface LoginBody {
   username?: unknown;
@@ -17,6 +22,13 @@ function validateUsername(value: unknown): string | null {
 }
 
 export async function POST(request: Request) {
+  if (!isSupabaseConfigured()) {
+    return NextResponse.json(
+      { error: NOT_CONFIGURED_MESSAGE, code: "NOT_CONFIGURED" },
+      { status: 503 }
+    );
+  }
+
   const body = (await request.json().catch(() => null)) as LoginBody | null;
 
   const username = validateUsername(body?.username);
