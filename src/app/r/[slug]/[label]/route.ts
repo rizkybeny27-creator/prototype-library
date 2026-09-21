@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 const VIEWPORT_META = '<meta name="viewport" content="width=device-width, initial-scale=1" />';
 const BASE_STYLE =
-  "<style>html,body{margin:0;min-height:100%;min-height:100dvh}*,*::before,*::after{box-sizing:border-box}</style>";
+  "<style>html,body{margin:0}*,*::before,*::after{box-sizing:border-box}</style>";
 const HEIGHT_PROBE =
   "<script>(function(){function h(){try{if(window.parent&&window.parent!==window){window.parent.postMessage({__penHeight:document.documentElement.scrollHeight},\"*\")}}catch(e){}}if(document.readyState===\"loading\"){window.addEventListener(\"load\",h)}else{h()}setTimeout(h,300);if(window.ResizeObserver){try{new ResizeObserver(h).observe(document.body)}catch(e){}}}())</script>";
 
@@ -24,7 +24,7 @@ function normalizeHtml(bytes: Uint8Array): Uint8Array<ArrayBuffer> {
     if (!/<meta[^>]*name=["']viewport["']/i.test(doc)) {
       doc = doc.replace(/<head([^>]*)>/i, (_match, attrs) => `<head${attrs}>${VIEWPORT_META}`);
     }
-    if (!/min-height\s*:\s*100/i.test(doc)) {
+    if (!/box-sizing\s*:\s*border-box/i.test(doc)) {
       doc = doc.replace(/<head([^>]*)>/i, (_match, attrs) => `<head${attrs}>${BASE_STYLE}`);
     }
   }
