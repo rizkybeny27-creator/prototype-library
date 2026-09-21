@@ -8,7 +8,7 @@ import type { VersionListItem } from "@/types";
 import { formatBytes, formatDate } from "@/lib/format";
 import { DeviceBadge, EmptyState, TestTypeBadge } from "@/components/ui/status";
 import { sectionTitleClass } from "@/components/ui/styles";
-import { DeviceFrame } from "@/components/device-frame";
+import PreviewFrame from "@/components/preview-frame";
 import UploadVersionForm from "@/components/upload-version-form";
 import CopyButton from "@/components/copy-button";
 
@@ -92,14 +92,13 @@ export default async function ProjectPage({
                 Preview internal · {previewVersion.label}
               </span>
             </div>
-            <DeviceFrame device={previewVersion.device}>
-              <iframe
-                title={`Preview ${detail.name} ${previewVersion.label}`}
-                src={`/r/${detail.slug}/${previewVersion.label}`}
-                sandbox="allow-scripts"
-                className="h-[60vh] w-full bg-white"
-              />
-            </DeviceFrame>
+            <PreviewFrame
+              slug={detail.slug}
+              label={previewVersion.label}
+              device={previewVersion.device}
+              title={`Preview ${detail.name} ${previewVersion.label}`}
+              className="min-h-[480px]"
+            />
           </div>
         ) : (
           <div className="mt-3">
@@ -192,9 +191,8 @@ function VersionRow({
               : "Belum ada feedback"}
           </span>
           <a
-            href={`/r/${projectSlug}/${version.label}`}
+            href={`/preview/${projectSlug}/${version.label}`}
             target="_blank"
-            rel="noreferrer"
             className="font-medium text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline"
           >
             Buka HTML

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DeviceFrame } from "@/components/device-frame";
+import PreviewFrame from "@/components/preview-frame";
 import type { Device } from "@/types";
 
 const MOBILE_QUERY = "(max-width: 767px)";
@@ -51,14 +51,7 @@ export default function TesterPreview({
           </button>
         </div>
       ) : null}
-      <DeviceFrame device={device} className="min-h-0 flex-1" contentClassName="h-full">
-        <iframe
-          title={title}
-          src={`/r/${slug}/${label}`}
-          sandbox="allow-scripts"
-          className="block h-full w-full border-0"
-        />
-      </DeviceFrame>
+      <PreviewFrame slug={slug} label={label} device={device} title={title} />
     </div>
   );
 }

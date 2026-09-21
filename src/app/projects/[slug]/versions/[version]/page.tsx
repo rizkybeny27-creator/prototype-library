@@ -10,7 +10,7 @@ import { Stars } from "@/components/star-rating";
 import PublishToggle from "@/components/publish-toggle";
 import CopyButton from "@/components/copy-button";
 import VersionTabs from "@/components/version-tabs";
-import { DeviceFrame } from "@/components/device-frame";
+import PreviewFrame from "@/components/preview-frame";
 import { DEVICE_LABELS, NPS_SCORES } from "@/types";
 import type { Feedback } from "@/types";
 
@@ -27,7 +27,8 @@ export default async function VersionDetailPage({
   const stats = feedbackStats(feedback);
 
   return (
-    <main className="mx-auto w-full max-w-4xl px-6 py-10">
+    <main className="mx-auto flex w-full max-w-4xl flex-col px-6 py-6">
+      <div className="shrink-0">
       <Link
         href={`/projects/${project.slug}`}
         className="text-sm font-medium text-zinc-500 transition hover:text-zinc-900"
@@ -66,9 +67,8 @@ export default async function VersionDetailPage({
           ) : null}
           <span>
             <Link
-              href={`/r/${project.slug}/${version.label}`}
+              href={`/preview/${project.slug}/${version.label}`}
               target="_blank"
-              rel="noreferrer"
               className="font-medium text-zinc-600 underline-offset-2 hover:text-zinc-900 hover:underline"
             >
               Buka HTML
@@ -77,7 +77,7 @@ export default async function VersionDetailPage({
         </div>
       </header>
 
-      <section className="mt-8 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+      <section className="mt-5 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
         <PublishToggle versionId={version.id} published={version.isPublished} />
         {version.isPublished ? (
           <p className="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
@@ -87,22 +87,27 @@ export default async function VersionDetailPage({
           </p>
         ) : null}
       </section>
+      </div>
 
-      <section className="mt-8">
+      <section className="mt-4 flex flex-1 flex-col">
         <VersionTabs
           previewPanel={
-            <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
-              <div className="flex justify-end border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 text-xs text-zinc-400">
-                Preview internal · {version.label}
+            <div className="flex min-h-0 flex-1 flex-col rounded-xl border border-zinc-200 bg-white">
+              <div className="flex flex-wrap items-center justify-between gap-2 gap-x-4 border-b border-zinc-200 bg-zinc-50 px-4 py-2.5">
+                <span className="text-xs text-zinc-400">
+                  Preview internal · {version.label}
+                </span>
+                <span className="text-xs text-zinc-400">
+                  Tinggi menyesuaikan konten prototype
+                </span>
               </div>
-              <DeviceFrame device={version.device}>
-                <iframe
-                  title={`Preview ${version.label}`}
-                  src={`/r/${project.slug}/${version.label}`}
-                  sandbox="allow-scripts"
-                  className="h-[60vh] w-full bg-white"
-                />
-              </DeviceFrame>
+              <PreviewFrame
+                slug={project.slug}
+                label={version.label}
+                device={version.device}
+                title={`Preview ${version.label}`}
+                className="bg-white"
+              />
             </div>
           }
           feedbackPanel={

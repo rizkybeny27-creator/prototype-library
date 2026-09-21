@@ -20,11 +20,11 @@ export default function VersionTabs({
   const [tab, setTab] = useState<TabId>("preview");
 
   return (
-    <div>
+    <div className="flex min-h-0 flex-1 flex-col">
       <div
         role="tablist"
         aria-label="Version detail"
-        className="flex w-fit gap-1 rounded-lg bg-zinc-100 p-1"
+        className="flex w-fit shrink-0 gap-1 rounded-lg bg-zinc-100 p-1"
       >
         {TABS.map((item) => {
           const active = tab === item.id;
@@ -54,7 +54,7 @@ export default function VersionTabs({
           role="tabpanel"
           id="tabpanel-preview"
           aria-labelledby="tab-preview"
-          className="mt-4"
+          className="mt-4 flex min-h-0 flex-1 flex-col"
         >
           {previewPanel}
         </div>
@@ -63,7 +63,7 @@ export default function VersionTabs({
           role="tabpanel"
           id="tabpanel-feedback"
           aria-labelledby="tab-feedback"
-          className="mt-4"
+          className="mt-4 min-h-0 flex-1 overflow-y-auto pr-1"
         >
           {feedbackPanel}
         </div>
